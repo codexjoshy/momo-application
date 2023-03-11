@@ -68,7 +68,7 @@ class MomoScheduleController extends Controller
                     $data[] = ["momo_schedule_id"=> $schedule->id, ...$customer];
                 }
                 DB::table('momo_schedule_customers')->insert($data);
-                return back()->with('success', "successful");
+                return redirect()->route('admin.schedule.index')->with('success', "successful");
             } catch (\Throwable $th) {
                 return back()->with('error', $th->getMessage());
             }
