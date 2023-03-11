@@ -91,6 +91,7 @@
                                     ++k;
                                     tr += `
                                         <tr>
+                                            <td>${k}</td>
                                             <td>${record[0]}</td>
                                             <td>${record[1]}</td>
                                             <td class='text-danger'>${errors[k]??''}</td>
