@@ -1,7 +1,6 @@
 <?php
 
-var_dump($_SERVER['DOCUMENT_ROOT']);
-exit;
+
 $targetFolder = $_SERVER['DOCUMENT_ROOT'] . '/../momo-application/storage/app/public';
 $linkFolder = $_SERVER['DOCUMENT_ROOT'] . '/winners/storage/';
 symlink($targetFolder, $linkFolder) or die("error creating symlink");
