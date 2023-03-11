@@ -32,6 +32,10 @@ class HomeController extends Controller
 
     public function home()
     {
+        $isCustomer = auth()->user()->authority == 'customer';
+        if ($isCustomer) {
+           return view('home');
+        }
         $disbursement = new Disbursement;
     //    dd( $disbursement->getAccountBalance());
        $momoTransactionId = $disbursement->transfer('referenceid', '8135978939', 20);

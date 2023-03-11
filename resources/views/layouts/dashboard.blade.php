@@ -63,6 +63,7 @@ $balance = 40000;
                         </ul>
                     </x-base.alert>
                     @endif
+                    @can('admin')
                     <div class="row">
                         <!-- Earnings (Monthly) Card Example -->
                         <div class="col-xl-3 col-md-6 mb-4">
@@ -103,6 +104,7 @@ $balance = 40000;
 
 
                     </div>
+                    @endcan
                     @yield('content')
                 </div>
             </main>
