@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreMomoScheduleRequest;
 use App\Http\Requests\UpdateMomoScheduleRequest;
 use App\Models\MomoScheduleCustomer;
+use App\Services\MomoScheduleService;
 use Exception;
 
 class MomoScheduleController extends Controller
@@ -23,7 +24,7 @@ class MomoScheduleController extends Controller
         return view('admin.schedule.index', compact('momoSchedules'));
     }
 
-    public function store(StoreMomoScheduleRequest $request)
+    public function store(StoreMomoScheduleRequest $request, MomoScheduleService $momoScheduleService)
     {
             $k = $amountSum = 0;
             $errors = [];
@@ -68,6 +69,7 @@ class MomoScheduleController extends Controller
                     $data[] = ["momo_schedule_id"=> $schedule->id, ...$customer];
                 }
                 DB::table('momo_schedule_customers')->insert($data);
+                $momoScheduleService->requestToPay($schedule->id, $data);
                 return redirect()->route('admin.schedule.index')->with('success', "successful");
             } catch (\Throwable $th) {
                 return back()->with('error', $th->getMessage());
