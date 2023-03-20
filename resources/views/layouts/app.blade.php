@@ -24,7 +24,7 @@
         <div id="layoutAuthentication_content">
             <main>
                 <div style='height: 100px;' class="w-100 text-center bg-light pt-2">
-                    <img width="100" height="100" class="img-fluid" src='{{ asset('images/ciin.png') }}' />
+                    <img width="100" height="100" class="img-fluid" src='{{ asset('logo.jpeg') }}' />
                 </div>
                 <h4 class="text-center">{{ config('app.name', 'Laravel') }}</h4>
                 @yield('content')
