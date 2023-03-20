@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreign('momo_schedule_id')->on('momo_schedules')->references('id')->cascadeOnDelete();
             $table->string('phone_no');
             $table->unsignedDecimal('amount', 19,2);
+            $table->enum("status", ["pending","success","failed"])->default("pending");
             $table->timestamps();
         });
     }
