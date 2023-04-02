@@ -28,7 +28,7 @@ class AjaxController extends Controller
                     // }
                     if ($phone && $amount && $amount > 0) {
                         if(!filter_var($phone, FILTER_VALIDATE_INT)) $errors[$k] = "invalid phone provided,";
-                        if(strlen($phone) < 10 || strlen($phone) > 11) $errors[$k] = "phone length ".strlen($phone)." does not meet standards,";
+                        if(strlen($phone) < 10 || strlen($phone) > 13) $errors[$k] = "phone length ".strlen($phone)." does not meet standards,";
                         if (in_array($phone, $phones)) $errors[$k] = "duplicate phone number,";
                         $phones[] = $phone;
 

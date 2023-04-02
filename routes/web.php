@@ -34,5 +34,10 @@ Route::middleware(['auth','isAdmin'])
     Route::post('/schedule/preview', [App\Http\Controllers\AjaxController::class, 'customerListPreview'])->name('process.customerList');
     Route::post('/schedule/upload', [App\Http\Controllers\MomoScheduleController::class, 'store'])->name('schedule.upload');
 
+    Route::get('/feature/', [App\Http\Controllers\AppFeatureController::class, 'index'])->name('feature.schedule.index');
+    Route::get('/feature/create', [App\Http\Controllers\AppFeatureController::class, 'create'])->name('feature.schedule.create');
+    Route::post('/feature/store', [App\Http\Controllers\AppFeatureController::class, 'store'])->name('feature.schedule.upload');
+
+
 });
 

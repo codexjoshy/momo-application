@@ -22,14 +22,14 @@
                 </x-aside-dropdown>
                 <x-aside-dropdown title="Airtime" key="airtime">
                     <x-slot name="icon">
-                        <i class="fa fa-clock"></i>
+                        <i class="fa fa-cloud"></i>
                     </x-slot>
-                    <x-aside-link :href="route('admin.schedule.index')" title="Schedules">
+                    <x-aside-link :href="route('admin.feature.schedule.index', ['type'=>'airtime'])" title="Schedules">
                         <x-slot name="icon">
                             <i class="fa fa-table"></i>
                         </x-slot>
                     </x-aside-link>
-                    <x-aside-link :href="route('admin.schedule.create')" title="Upload">
+                    <x-aside-link :href="route('admin.feature.schedule.create', ['type'=>'airtime'])" title="Upload">
                         <x-slot name="icon">
                             <i class="fa fa-upload"></i>
                         </x-slot>
