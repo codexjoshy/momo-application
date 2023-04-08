@@ -108,7 +108,7 @@ class AppFeatureController extends Controller
         } catch (\Throwable $th) {
             return back()->with('error', $th->getMessage());
         }
-        return redirect()->route('admin.schedule.index')->with('success', "successful");
+        return redirect()->route('admin.feature.schedule.index', ['type'=>'airtime'])->with('success', "successful");
     }
 
     /**
