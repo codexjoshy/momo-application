@@ -9,9 +9,16 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreAppFeatureRequest;
 use App\Http\Requests\UpdateAppFeatureRequest;
 use App\Services\AppFeatureService;
+use App\Services\Contracts\SmsServiceInterface;
 
 class AppFeatureController extends Controller
 {
+    protected SmsServiceInterface $smsService;
+    public function __construct(SmsServiceInterface $smsService)
+    {
+        // $this->middleware('auth');
+        $this->smsService = $smsService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -22,8 +29,10 @@ class AppFeatureController extends Controller
         }
         $view = $request->type;
         $FeatureSchedules = AppFeature::where('type', $request->type)
+        ->latest()
             ->get();
-        return view("admin.$view.index", compact('FeatureSchedules'));
+        $smsBalance = $this->smsService->checkBalance();
+        return view("admin.$view.index", compact('FeatureSchedules', 'smsBalance'));
     }
 
     /**
@@ -35,13 +44,14 @@ class AppFeatureController extends Controller
             return redirect()->route('admin.feature.schedule.index', ['type'=>'airtime']);
         }
         $view = $request->type;
-        return view("admin.$view.create");
+        $smsBalance = $this->smsService->checkBalance();
+        return view("admin.$view.create", compact('smsBalance'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAppFeatureRequest $request)
+    public function store(StoreAppFeatureRequest $request, SmsServiceInterface $smsService, AppFeatureService $FeatureService)
     {
         $k = $amountSum = 0;
         $errors = $phones = $customers = [];
@@ -57,7 +67,7 @@ class AppFeatureController extends Controller
                         if(!filter_var($phone, FILTER_VALIDATE_INT)) $errors[$k] = "invalid phone provided,";
                         if(strlen($phone) < 10 || strlen($phone) > 13) $errors[$k] = "phone length ".strlen($phone)." does not meet standards,";
                         if (in_array($phone, $phones)) $errors[$k] = "duplicate phone number,";
-                        $phones[] = $phone;
+                        $phones[] = "$phone";
 
                         if(!count($errors)){
                             $customers[] = ["phoneNumber"=> "+".$phone, "amount"=> floatval($amount), "currencyCode"=>"NGN"];
@@ -71,6 +81,9 @@ class AppFeatureController extends Controller
                 $k++;
                 throw_if(count($errors),  ("Error Processing Request"));
             }
+            // dd($phones);
+            // $d = $FeatureService->sendSms($phones, "Congratulations you won", $smsService);
+            // dd($d);
             DB::beginTransaction();
             $schedule = AppFeature::create([
                 "uploaded_by"=>auth()->id(),
@@ -83,7 +96,14 @@ class AppFeatureController extends Controller
             //     $data[] = ["momo_schedule_id"=> $schedule->id, ...$customer];
             // }
             // DB::table('app_feature_customers')->insert($data);
-            (new AppFeatureService)->sendAirTime($schedule->id, $customers);
+            $response = $FeatureService->sendAirTime($schedule->id, $customers);
+            if($response['status']){
+                $sms = $FeatureService->sendSms($response['sentPhones'], $schedule->message, $smsService);
+                DB::table('app_feature_customers')->insert($response['customers']);
+                $schedule->update(["sms_id"=> $sms['messageId'] ?? '']);#102023040820320800000064662
+            }else{
+                throw new \Exception($response['error']??'sorry something went wrong sending airtime');
+            }
             DB::commit();
         } catch (\Throwable $th) {
             return back()->with('error', $th->getMessage());

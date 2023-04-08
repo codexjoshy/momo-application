@@ -186,6 +186,8 @@ return [
          * Package Service Providers...
          */
 
+         App\Providers\SmsServiceProvider::class,
+
         /*
          * Application Service Providers...
          */

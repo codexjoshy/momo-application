@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('message');
             $table->unsignedDecimal('total', 19,2);
             $table->enum('type', ["airtime"]);
+            $table->string('sms_id')->nullable();
             $table->timestamps();
         });
     }

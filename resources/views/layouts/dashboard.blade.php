@@ -101,7 +101,7 @@ $balance = 40000;
                             </div>
                         </div>
                         <!-- Earnings (Monthly) Card Example -->
-
+                        @yield('metrics')
 
                     </div>
                     @endcan
