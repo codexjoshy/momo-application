@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\afrikaT\AfrikaTalkingService;
 use App\Services\Contracts\SmsServiceInterface;
 use Illuminate\Http\Request;
 
@@ -27,14 +28,20 @@ class HomeController extends Controller
     public function index()
     {
         $isCustomer = auth()->user()->authority == 'customer';
+        $afrikaTBalance = "";
         if(!$isCustomer){
             $smsBalance = $this->smsService->checkBalance();
+            $afrikaT = (new AfrikaTalkingService)->getBalance();
+            if ($afrikaT['status'] == 'success') {
+                $bal = explode(" ", $afrikaT['data']->UserData->balance);
+                $afrikaTBalance = end($bal);
+            }
 
         }else{
             $smsBalance = $this->smsService->checkBalance();
         }
         // dd($smsBalance);
-        return view('home', compact('smsBalance'));
+        return view('home', compact('smsBalance','afrikaTBalance'));
     }
 
     // public function home()

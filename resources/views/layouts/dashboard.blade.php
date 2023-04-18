@@ -1,6 +1,6 @@
 @php
 $lastPay = \App\Models\MomoSchedule::query()->select('disbursed_amount')->latest()->value('disbursed_amount');
-$balance = 40000;
+$balance = 0;
 @endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">

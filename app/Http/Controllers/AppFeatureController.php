@@ -24,15 +24,20 @@ class AppFeatureController extends Controller
      */
     public function index(Request $request)
     {
-        if(!$request->has('type')){
-            return redirect()->route('admin.feature.schedule.index', ['type'=>'airtime']);
+        if (!$request->has('type')) {
+            return redirect()->route('admin.feature.schedule.index', ['type' => 'airtime']);
         }
         $view = $request->type;
         $FeatureSchedules = AppFeature::where('type', $request->type)
-        ->latest()
+            ->latest()
             ->get();
         $smsBalance = $this->smsService->checkBalance();
-        return view("admin.$view.index", compact('FeatureSchedules', 'smsBalance'));
+        $afrikaT = (new \App\Services\afrikaT\AfrikaTalkingService)->getBalance();
+        if ($afrikaT['status'] == 'success') {
+            $bal = explode(" ", $afrikaT['data']->UserData->balance);
+            $afrikaTBalance = end($bal);
+        }
+        return view("admin.$view.index", compact('FeatureSchedules', 'smsBalance', 'afrikaTBalance'));
     }
 
     /**
@@ -40,8 +45,8 @@ class AppFeatureController extends Controller
      */
     public function create(Request $request)
     {
-        if(!$request->has('type')){
-            return redirect()->route('admin.feature.schedule.index', ['type'=>'airtime']);
+        if (!$request->has('type')) {
+            return redirect()->route('admin.feature.schedule.index', ['type' => 'airtime']);
         }
         $view = $request->type;
         $smsBalance = $this->smsService->checkBalance();
@@ -64,13 +69,13 @@ class AppFeatureController extends Controller
                     $phone = (int) trim($phone);
                     $amount = trim($amount);
                     if ($phone && $amount && $amount > 0) {
-                        if(!filter_var($phone, FILTER_VALIDATE_INT)) $errors[$k] = "invalid phone provided,";
-                        if(strlen($phone) < 10 || strlen($phone) > 13) $errors[$k] = "phone length ".strlen($phone)." does not meet standards,";
+                        if (!filter_var($phone, FILTER_VALIDATE_INT)) $errors[$k] = "invalid phone provided,";
+                        if (strlen($phone) < 10 || strlen($phone) > 13) $errors[$k] = "phone length " . strlen($phone) . " does not meet standards,";
                         if (in_array($phone, $phones)) $errors[$k] = "duplicate phone number,";
                         $phones[] = "$phone";
 
-                        if(!count($errors)){
-                            $customers[] = ["phoneNumber"=> "+".$phone, "amount"=> floatval($amount), "currencyCode"=>"NGN"];
+                        if (!count($errors)) {
+                            $customers[] = ["phoneNumber" => "+" . $phone, "amount" => floatval($amount), "currencyCode" => "NGN"];
                         }
                     } else {
                         $errors[$k] =  "invalid data provided";
@@ -79,17 +84,17 @@ class AppFeatureController extends Controller
                     $amountSum += floatval($amount);
                 }
                 $k++;
-                throw_if(count($errors),  ("Error Processing Request"));
+                throw_if(count($errors), ("Error Processing Request"));
             }
             // dd($phones);
             // $d = $FeatureService->sendSms($phones, "Congratulations you won", $smsService);
             // dd($d);
             DB::beginTransaction();
             $schedule = AppFeature::create([
-                "uploaded_by"=>auth()->id(),
-                "title"=> $request->title,
-                "message"=>$request->message,
-                "total"=> floatval($request->amount)
+                "uploaded_by" => auth()->id(),
+                "title" => $request->title,
+                "message" => $request->message,
+                "total" => floatval($request->amount)
             ]);
             // $data = [];
             // foreach ($customers as $customer) {
@@ -97,18 +102,18 @@ class AppFeatureController extends Controller
             // }
             // DB::table('app_feature_customers')->insert($data);
             $response = $FeatureService->sendAirTime($schedule->id, $customers);
-            if($response['status']){
+            if ($response['status']) {
                 $sms = $FeatureService->sendSms($response['sentPhones'], $schedule->message, $smsService);
                 DB::table('app_feature_customers')->insert($response['customers']);
-                $schedule->update(["sms_id"=> $sms['messageId'] ?? '']);#102023040820320800000064662
-            }else{
-                throw new \Exception($response['error']??'sorry something went wrong sending airtime');
+                $schedule->update(["sms_id" => $sms['messageId'] ?? '']); #102023040820320800000064662
+            } else {
+                throw new \Exception($response['error'] ?? 'sorry something went wrong sending airtime');
             }
             DB::commit();
         } catch (\Throwable $th) {
             return back()->with('error', $th->getMessage());
         }
-        return redirect()->route('admin.feature.schedule.index', ['type'=>'airtime'])->with('success', "successful");
+        return redirect()->route('admin.feature.schedule.index', ['type' => 'airtime'])->with('success', "successful");
     }
 
     /**
