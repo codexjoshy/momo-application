@@ -12,7 +12,7 @@
                     <div class="h5 mb-0 font-weight-bold text-gray-800">&#8358; {{ number_format($smsBalance['balance']) }}</div>
                 </div>
                 <div class="col-auto">
-                    <i class="fa fa-money fa-2x text-gray-300">Termii</i>
+                    <i class="fa fa-money fa-2x text-gray-300"></i>
                 </div>
             </div>
         </div>
