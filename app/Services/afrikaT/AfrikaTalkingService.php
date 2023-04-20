@@ -38,7 +38,7 @@ use AfricasTalking\SDK\AfricasTalking;
             $phoneNumbers[] = $recipient['phoneNumber'];
 
         }
-        $this->sendSMS("This is a test message", $phoneNumbers);
+        // $this->sendSMS("This is a test message", $phoneNumbers);
         $Airtime = $this->client->airtime();
         $result = $Airtime->send(["recipients"=>$recipients], ["maxNumRetry"=>3]);
         $status  = $result['status'] ?? '';
