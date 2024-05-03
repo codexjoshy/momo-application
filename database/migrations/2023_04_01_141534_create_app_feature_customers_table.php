@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('app_feature_id');
             $table->foreign('app_feature_id')->on('app_features')->references('id')->cascadeOnDelete();
             $table->string('phone_no');
-            $table->unsignedDecimal('amount', 19,2);
-            $table->enum("status", ["pending","success","fail"])->default("pending");
+            $table->unsignedDecimal('amount', 19, 2);
+            $table->enum("status", ["pending", "success", "fail"])->default("pending");
             $table->string('transaction_id')->nullable();
             $table->json('other_info')->nullable();
             $table->timestamps();

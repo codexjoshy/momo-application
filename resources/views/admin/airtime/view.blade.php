@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('metrics')
+{{-- @section('metrics')
 @can('admin')
 <div class="col-xl-3 col-md-6 mb-4">
     <div class="card border-left-primary shadow h-100 py-2">
@@ -35,45 +35,51 @@
     </div>
 </div>
 @endcan
-@endsection
+@endsection --}}
 @section('content')
 <div class="container">
     <div class="row ">
         <x-base.card title="Schedules" class="col-10">
-            <x-base.table>
+            <x-base.datatable>
                 <x-slot name="thead">
                     <tr>
                         <th>S/N</th>
-                        <th>Title</th>
+                        <th>Customer Phone</th>
                         <th>Amount</th>
-                        <th>Message</th>
+                        <th>status</th>
+                        <th>Transaction ID</th>
                         <th>Date</th>
-                        <th>Beneficiaries</th>
                     </tr>
                 </x-slot>
                 <x-slot name="tbody">
-                    @foreach ($FeatureSchedules as $schedule)
+                    @foreach ($customers as $customer)
+                    @php
+                    $bg = "btn-warning";
+                    if($customer->status == 'success') $bg = "btn-success";
+                    if($customer->status == 'fail') $bg = "btn-danger";
+                    $sent="";
+                    if ($customer->transaction_id) {
+                    $sent = $customer->updated_at->format('Y-m-d H:i:s');
+                    }
+                    @endphp
                     <tr>
-                        <td>{{ ++$loop->index; }}</td>
-                        <td>{{ $schedule->title }}</td>
-                        <td>{{ number_format($schedule->total, 2) }}</td>
-                        <td>{{ $schedule->message }}</td>
-                        <td>{{ $schedule->created_at->format('Y-m-d') }}</td>
-                        <td class="d-flex justify-content-between">
-                            <a href="{{ route('admin.feature.schedule.view', $schedule->id) }}" class="btn-info btn-sm"
-                                key="review" id="modalBtn">
-                                view
-                            </a>
-
-                            <x-base.form :action="route('admin.schedule.delete', $schedule->id)">
-                                @method('delete')
-                                <button class="btn btn-danger btn-sm">Delete</button>
-                            </x-base.form>
+                        <td>{{ ++$loop->index }}</td>
+                        <td>{{ $customer->phone_no }}</td>
+                        <td> ₦{{ number_format($customer->amount, 2) }}</td>
+                        <td><span class="bg btn btn-sm {{ $bg }} ">{{ $customer->status }}</span> </td>
+                        <td>{{ $customer->transaction_id }}</td>
+                        <td>
+                            <p><small>scheduled @ {{ optional($customer->created_at)->format('Y-m-d H::i::s') }}</small>
+                            </p>
+                            @if ($sent)
+                            <p><small>airtime sent @ {{ $sent }}</small></p>
+                            @endif
                         </td>
                     </tr>
                     @endforeach
                 </x-slot>
-            </x-base.table>
+            </x-base.datatable>
+
         </x-base.card>
     </div>
 </div>

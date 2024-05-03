@@ -8,16 +8,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreAppFeatureRequest;
 use App\Http\Requests\UpdateAppFeatureRequest;
+use App\Services\airtime\AirtimeProcessor;
 use App\Services\AppFeatureService;
 use App\Services\Contracts\SmsServiceInterface;
 
 class AppFeatureController extends Controller
 {
     protected SmsServiceInterface $smsService;
-    public function __construct(SmsServiceInterface $smsService)
+    protected AirtimeProcessor $airtimeService;
+    public function __construct(SmsServiceInterface $smsService, AirtimeProcessor $airtimeService)
     {
         // $this->middleware('auth');
         $this->smsService = $smsService;
+        $this->airtimeService = $airtimeService;
     }
     /**
      * Display a listing of the resource.
@@ -32,31 +35,33 @@ class AppFeatureController extends Controller
             ->latest()
             ->get();
         $smsBalance = $this->smsService->checkBalance();
-        $afrikaT = (new \App\Services\afrikaT\AfrikaTalkingService)->getBalance();
-        if ($afrikaT['status'] == 'success') {
-            $bal = explode(" ", $afrikaT['data']->UserData->balance);
-            $afrikaTBalance = end($bal);
-        }
-        return view("admin.$view.index", compact('FeatureSchedules', 'smsBalance', 'afrikaTBalance'));
+        // $afrikaT = (new \App\Services\afrikaT\AfrikaTalkingService)->getBalance();
+        $airtimeBal = $this->airtimeService->checkBalance()['balance'];
+        return view("admin.$view.index", compact('FeatureSchedules', 'smsBalance', 'airtimeBal'));
     }
-
+    public function view(AppFeature $feature)
+    {
+        $customers = $feature->customers;
+        return view("admin.airtime.view", compact('customers', 'feature'));
+    }
     /**
      * Show the form for creating a new resource.
      */
     public function create(Request $request)
     {
-        if (!$request->has('type')) {
+        if (!$request->has('type') || $request->type != 'airtime') {
             return redirect()->route('admin.feature.schedule.index', ['type' => 'airtime']);
         }
         $view = $request->type;
         $smsBalance = $this->smsService->checkBalance();
+        $airTimeBalance = $this->airtimeService->checkBalance();
         return view("admin.$view.create", compact('smsBalance'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAppFeatureRequest $request, SmsServiceInterface $smsService, AppFeatureService $FeatureService)
+    public function store(StoreAppFeatureRequest $request)
     {
         $k = $amountSum = 0;
         $errors = $phones = $customers = [];
@@ -96,24 +101,31 @@ class AppFeatureController extends Controller
                 "message" => $request->message,
                 "total" => floatval($request->amount)
             ]);
-            // $data = [];
-            // foreach ($customers as $customer) {
-            //     $data[] = ["momo_schedule_id"=> $schedule->id, ...$customer];
-            // }
-            // DB::table('app_feature_customers')->insert($data);
-            $response = $FeatureService->sendAirTime($schedule->id, $customers);
-            if ($response['status']) {
-                $sms = $FeatureService->sendSms($response['sentPhones'], $schedule->message, $smsService);
-                DB::table('app_feature_customers')->insert($response['customers']);
-                $schedule->update(["sms_id" => $sms['messageId'] ?? '']); #102023040820320800000064662
-            } else {
-                throw new \Exception($response['error'] ?? 'sorry something went wrong sending airtime');
+            $data = [];
+            foreach ($customers as $customer) {
+                $data[] = [
+                    "app_feature_id" => $schedule->id,
+                    "phone_no" => $customer['phoneNumber'],
+                    "amount" => $customer['amount'],
+                    "status" => "pending",
+                    "created_at" => now(),
+                    "updated_at" => now(),
+                ];
             }
+            DB::table('app_feature_customers')->insert($data);
+            // $response = $FeatureService->sendAirTime($schedule->id, $customers);
+            // if ($response['status']) {
+            //     $sms = $FeatureService->sendSms($response['sentPhones'], $schedule->message, $smsService);
+            //     DB::table('app_feature_customers')->insert($response['customers']);
+            //     $schedule->update(["sms_id" => $sms['messageId'] ?? '']); #102023040820320800000064662
+            // } else {
+            //     throw new \Exception($response['error'] ?? 'sorry something went wrong sending airtime');
+            // }
             DB::commit();
         } catch (\Throwable $th) {
             return back()->with('error', $th->getMessage());
         }
-        return redirect()->route('admin.feature.schedule.index', ['type' => 'airtime'])->with('success', "successful");
+        return redirect()->route('admin.feature.schedule.index', ['type' => 'airtime'])->with('success', "Schedule has been uploaded, you can track your schedule");
     }
 
     /**

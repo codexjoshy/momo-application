@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class AppFeature extends Model
 {
     use HasFactory;
-    protected $guarded =[];
+    protected $guarded = [];
     protected $casts = [
-        "created_at"=> 'date',
-        "updated_at"=> 'date',
-        "other_info"=> 'array'
+        "created_at" => 'datetime',
+        "updated_at" => 'datetime',
+        "other_info" => 'array'
     ];
 
 

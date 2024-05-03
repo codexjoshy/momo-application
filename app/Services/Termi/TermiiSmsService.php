@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Response as JsonResponse;
 
 use Illuminate\Support\Facades\Http;
 use App\Services\Contracts\SmsServiceInterface;
+use Illuminate\Support\Facades\Log;
 
 // use Illuminate\Support\Facades\Http;
 class TermiiSmsService implements SmsServiceInterface
@@ -73,13 +74,12 @@ class TermiiSmsService implements SmsServiceInterface
 
         $response = $this->getResponse();
 
-        if($response['status']){
-            return[
-                "currency"=>$response['data']['currency'] ?? '',
-                "balance"=> $response['data']['balance'] ?? ''
+        if ($response['status']) {
+            return [
+                "currency" => $response['data']['currency'] ?? '',
+                "balance" => $response['data']['balance'] ?? ''
             ];
         }
-
     }
 
     /**
@@ -95,12 +95,12 @@ class TermiiSmsService implements SmsServiceInterface
     {
         $payload = [
             'to' =>  $to,
-            'type'=> 'plain',
+            'type' => 'plain',
             // 'to' => implode(',', $to),
             'sms' => $message,
             'api_key' => $this->apiKey,
-            'from'=> $this->from,
-            'channel'=> $this->_channel,
+            'from' => $this->from,
+            'channel' => $this->_channel,
         ];
         if ($from) {
             $payload['from'] = $from;
@@ -109,17 +109,20 @@ class TermiiSmsService implements SmsServiceInterface
         // $this->httpResponse = Http::post($this->apiUrl . '/sms/send', $payload);
         // $response = $this->getResponse();
         $response = $this->httpHandler->makeRequest($this->apiUrl . 'sms/send', 'POST', $payload,);
-        $code = http_response_code();
-        if($code == 200){
-            return[
-                "status"=>true,
-                "messageId"=> $response['message_id'] ?? null
+        $this->logger("response for sms sending by termii", json_encode($response));
+        $code = $response['code'];
+        if (strtolower($code) == "ok") {
+            return [
+                "status" => true,
+                "messageId" => $response['message_id'] ?? null,
+                "data" => $response
             ];
         }
 
         return [
-            "status"=> false,
-            "messageId"=> null
+            "status" => false,
+            "messageId" => null,
+            "data" => $response
         ];
     }
 
@@ -137,21 +140,19 @@ class TermiiSmsService implements SmsServiceInterface
             ]);
             $response = $this->getResponse();
             throw_if(!$response['status'], $response['message']);
-            if($response['status']){
-                return[
-                    "currency"=>$response['data']['currency'] ?? '',
-                    "balance"=> $response['data']['balance'] ?? ''
+            if ($response['status']) {
+                return [
+                    "currency" => $response['data']['currency'] ?? '',
+                    "balance" => $response['data']['balance'] ?? ''
                 ];
             }
-
         } catch (\Throwable $th) {
             throw $th;
         }
         return [
-            "currency"=>null,
-            "balance"=> null
+            "currency" => null,
+            "balance" => null
         ];
-
     }
 
     /**
@@ -175,10 +176,10 @@ class TermiiSmsService implements SmsServiceInterface
         ]);
 
         $response = $this->getResponse();
-        if($response['status']){
-            return[
-                "currency"=>$response['data']['currency'] ?? '',
-                "balance"=> $response['data']['balance'] ?? ''
+        if ($response['status']) {
+            return [
+                "currency" => $response['data']['currency'] ?? '',
+                "balance" => $response['data']['balance'] ?? ''
             ];
         }
     }
@@ -198,10 +199,10 @@ class TermiiSmsService implements SmsServiceInterface
         ]);
 
         $response = $this->getResponse();
-        if($response['status']){
-            return[
-                "currency"=>$response['data']['currency'] ?? '',
-                "balance"=> $response['data']['balance'] ?? ''
+        if ($response['status']) {
+            return [
+                "currency" => $response['data']['currency'] ?? '',
+                "balance" => $response['data']['balance'] ?? ''
             ];
         }
     }
@@ -221,10 +222,10 @@ class TermiiSmsService implements SmsServiceInterface
         ]);
 
         $response = $this->getResponse();
-        if($response['status']){
-            return[
-                "currency"=>$response['data']['currency'] ?? '',
-                "balance"=> $response['data']['balance'] ?? ''
+        if ($response['status']) {
+            return [
+                "currency" => $response['data']['currency'] ?? '',
+                "balance" => $response['data']['balance'] ?? ''
             ];
         }
     }
@@ -244,10 +245,10 @@ class TermiiSmsService implements SmsServiceInterface
         ]);
 
         $response = $this->getResponse();
-        if($response['status']){
-            return[
-                "currency"=>$response['data']['currency'] ?? '',
-                "balance"=> $response['data']['balance'] ?? ''
+        if ($response['status']) {
+            return [
+                "currency" => $response['data']['currency'] ?? '',
+                "balance" => $response['data']['balance'] ?? ''
             ];
         }
     }
@@ -279,4 +280,10 @@ class TermiiSmsService implements SmsServiceInterface
         ];
     }
 
+    private function logger($title, $data)
+    {
+
+        Log::channel('daily')->info($title);
+        Log::channel('daily')->info($data);
+    }
 }
