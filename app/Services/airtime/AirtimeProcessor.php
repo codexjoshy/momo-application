@@ -6,6 +6,8 @@ use App\Models\Uuid;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 
 class AirtimeProcessor
 {
@@ -27,6 +29,7 @@ class AirtimeProcessor
    $this->username = config('airtime.username');
    $this->from = config('airtime.smsFrom');
    $this->baseUrl = config('airtime.base_url');
+   $this->client =  new Client();
   } catch (\Throwable $th) {
    throw $th;
   }
@@ -47,8 +50,37 @@ class AirtimeProcessor
 
   return $this->getResponse();
  }
-
  public function checkBalance(): string|array
+ {
+  $encodedData = $this->generateData();
+  $balanceUrl = "{$this->baseUrl}";
+
+  $client = new Client();
+  $balance = 0;
+  try {
+   $response = $client->request('GET', $balanceUrl, [
+    'query' => ['jParams' => $encodedData]
+   ]);
+
+   $responseData = $this->getResponseData($response);
+   $this->logger("balance check", json_encode($responseData));
+
+   if ($responseData['status']) {
+    $data = $responseData['data'];
+    $balance = $data['balances']['main'] ?? 0;
+    return ["balance" => $balance];
+   } else {
+    return ["balance" => $balance];
+   }
+  } catch (ClientException $e) {
+   Log::error('API request failed: ' . $e->getMessage());
+   return ["balance" => $balance];
+  } catch (\Exception $e) {
+   Log::error('API request failed: ' . $e->getMessage());
+   return ["balance" => $balance];
+  }
+ }
+ public function checkBalance2(): string|array
  {
   $encodedData = $this->generateData();
   $balanceUrl = "{$this->baseUrl}";
@@ -83,6 +115,29 @@ class AirtimeProcessor
   Uuid::create(['uuid' => $uuid]);
 
   return $uuid;
+ }
+
+
+ private function getResponseData($response)
+ {
+  $statusCode = $response->getStatusCode();
+  $responseData = $response->getBody()->getContents();
+
+  if ($statusCode === 200) {
+   return [
+    "status" => true,
+    "data" => json_decode($responseData, true),
+    "message" => $response->getReasonPhrase(),
+    "statusCode" => $statusCode
+   ];
+  } else {
+   return [
+    "status" => false,
+    "data" => [],
+    "message" => $response->getReasonPhrase(),
+    "statusCode" => $statusCode
+   ];
+  }
  }
  /**
   * Undocumented function

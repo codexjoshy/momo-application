@@ -35,7 +35,7 @@ class HomeController extends Controller
         $airTimeBalance = 0;
         if (!$isCustomer) {
             $smsBalance = $this->smsService->checkBalance();
-            // $airTimeBalance = $this->airtimeService->checkBalance()['balance'];
+            $airTimeBalance = $this->airtimeService->checkBalance()['balance'];
 
             // $afrikaT = (new AfrikaTalkingService)->getBalance();
             // if ($afrikaT['status'] == 'success') {
