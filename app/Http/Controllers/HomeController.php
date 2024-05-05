@@ -3,21 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Services\afrikaT\AfrikaTalkingService;
+use App\Services\airtime\AirtimeProcessor;
 use App\Services\Contracts\SmsServiceInterface;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
     protected SmsServiceInterface $smsService;
+    protected AirtimeProcessor $airtimeService;
+
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(SmsServiceInterface $smsService)
+    public function __construct(SmsServiceInterface $smsService, AirtimeProcessor $airtimeService)
     {
         // $this->middleware('auth');
         $this->smsService = $smsService;
+        $this->airtimeService = $airtimeService;
     }
 
     /**
@@ -28,20 +32,22 @@ class HomeController extends Controller
     public function index()
     {
         $isCustomer = auth()->user()->authority == 'customer';
-        $afrikaTBalance = "";
-        if(!$isCustomer){
+        $airTimeBalance = 0;
+        if (!$isCustomer) {
             $smsBalance = $this->smsService->checkBalance();
-            $afrikaT = (new AfrikaTalkingService)->getBalance();
-            if ($afrikaT['status'] == 'success') {
-                $bal = explode(" ", $afrikaT['data']->UserData->balance);
-                $afrikaTBalance = end($bal);
-            }
+            $airTimeBalance = $this->airtimeService->checkBalance()['balance'];
 
-        }else{
+            // $afrikaT = (new AfrikaTalkingService)->getBalance();
+            // if ($afrikaT['status'] == 'success') {
+            //     $bal = explode(" ", $afrikaT['data']->UserData->balance);
+            //     $afrikaTBalance = end($bal);
+            // }
+
+        } else {
             $smsBalance = $this->smsService->checkBalance();
         }
         // dd($smsBalance);
-        return view('home', compact('smsBalance','afrikaTBalance'));
+        return view('home', compact('smsBalance', 'airTimeBalance'));
     }
 
     // public function home()
