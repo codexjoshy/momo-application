@@ -58,6 +58,10 @@ class AirtimeProcessor
   $client = new Client();
   $balance = 0;
   try {
+   $this->httpResponse  = Http::get("https://jsonplaceholder.typicode.com/todos/1");
+   $response = $this->getResponse();
+   $this->logger("balance check", json_encode($response));
+
    $response = $client->request('GET', $balanceUrl, [
     'query' => ['jParams' => $encodedData]
    ]);
