@@ -52,7 +52,8 @@ class AirtimeProcessor
  }
  public function checkBalance(): string|array
  {
-  $encodedData = $this->generateData();
+  $time = time();
+  $encodedData = $this->generateData([], "BAL-$time");
   $balanceUrl = "{$this->baseUrl}";
 
   $client = new Client();
