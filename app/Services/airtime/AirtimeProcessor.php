@@ -64,7 +64,7 @@ class AirtimeProcessor
    // $this->logger("balance check", json_encode($response));
    $data = json_encode(["sid" => "iIvvvv-1-2022-01-04", "config" => "api", "ak" => "7dd5dccf8012c6412b079cb32660b981", "apid" => "JollyTetra", "rc" => "1", "type" => "7"]);
    $response = $client->request('GET', $balanceUrl, [
-    'query' => ['jParams' => base64_encode($data)]
+    'query' => ['jParams' => urlencode(base64_encode($data))]
    ]);
 
    $responseData = $this->getResponseData($response);
