@@ -33,7 +33,10 @@ Route::get('/bal', function () {
     ));
 
     $response = curl_exec($curl);
-
+    // Check if any error occurred
+    if (curl_errno($curl)) {
+        echo 'Curl error: ' . curl_error($curl);
+    }
     curl_close($curl);
     echo $response;
 });
