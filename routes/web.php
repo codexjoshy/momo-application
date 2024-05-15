@@ -18,6 +18,32 @@ Route::get('/home', function () {
     $smsBalance = [];
     return view('home', compact('smsBalance'));
 });
+Route::get('/bal2', function () {
+    // Initialize a cURL session
+    $ch = curl_init();
+
+    // Set the URL you want to curl
+    //curl_setopt($ch, CURLOPT_URL, "https://www.example.com");
+    // curl_setopt($ch, CURLOPT_URL, "http://64.226.97.232:27171/");
+    curl_setopt($ch, CURLOPT_URL, "http://64.226.97.232:27171/jmg/web.html?jParams=eyJzaWQiOiJCQUwiLCJjb25maWciOiJhcGkiLCJhayI6IjdkZDVkY2NmODAxMmM2NDEyYjA3OWNiMzI2NjBiOTgxIiwiYXBpZCI6IkpvbGx5VGV0cmEiLCJyYyI6IjEiLCJ0eXBlIjoiNyJ9");
+    // Set options to return the transfer as a string and follow any redirects
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+    // Execute the cURL session and store the result in a variable
+    $response = curl_exec($ch);
+
+    // Check for errors
+    if (curl_errno($ch)) {
+        echo 'Curl error: ' . curl_error($ch);
+    } else {
+        // Output the response
+        echo $response;
+    }
+
+    // Close the cURL session
+    curl_close($ch);
+});
 Route::get('/bal', function () {
     $curl = curl_init();
 
@@ -40,6 +66,7 @@ Route::get('/bal', function () {
     curl_close($curl);
     echo $response;
 });
+
 
 Route::get('/phpinfo', function () {
     phpinfo();
