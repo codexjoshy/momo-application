@@ -39,8 +39,8 @@
 @section('content')
 <div class="container">
     <div class="row ">
-        <x-base.card title="Schedules" class="col-10">
-            <x-base.table>
+        <x-base.card title="Schedules" class="col-12">
+            <x-base.datatable>
                 <x-slot name="thead">
                     <tr>
                         <th>S/N</th>
@@ -73,7 +73,7 @@
                     </tr>
                     @endforeach
                 </x-slot>
-            </x-base.table>
+            </x-base.datatable>
         </x-base.card>
     </div>
 </div>
