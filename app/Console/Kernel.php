@@ -14,8 +14,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         date_default_timezone_set('Africa/Lagos');
-        Log::channel('daily')->info("Scheduling...");
-        // $schedule->command('send:airtime')->everyTwoMinutes()->withoutOverlapping();
+        // Log::channel('daily')->info("Scheduling...");
+        $schedule->command('send:airtime')->everyMinute()->withoutOverlapping();
         // $schedule->command('inspire')->hourly();
     }
 

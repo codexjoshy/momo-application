@@ -28,26 +28,28 @@ class SendAirtime extends Command
      */
     public function handle()
     {
-        $customers = AppFeatureCustomer::whereNull('transaction_id')->limit(50)->get();
-        $AirtimeService = new AirtimeProcessor;
-        foreach ($customers as $customer) {
-            try {
-                $phone = $customer['phone_no'];
-                $amount = floatval($customer['amount']);
-                $response = $AirtimeService->sendAirtime($phone, $amount, "");
-                if ($response['status'] && $response['data']) {
-                    $data = $response['data'];
-                    $transactionId = $data['sid'];
+        Log::channel('daily')->info("Scheduling airtime:...");
 
-                    // update customer
-                    $customer->update(["transaction_id" => $transactionId, "updated_at" => now(), "status" => 'success', "other_info" => $response]);
-                }
-            } catch (\Throwable $th) {
-                //throw $th;
-                $d = json_encode($customer, true);
-                Log::channel('daily')->info("Error processing customer : $d: " . $th->getMessage());
-                $customer->update(["status" => "fail", "other_info" => $response]);
-            }
-        }
+        // $customers = AppFeatureCustomer::whereNull('transaction_id')->limit(50)->get();
+        // $AirtimeService = new AirtimeProcessor;
+        // foreach ($customers as $customer) {
+        //     try {
+        //         $phone = $customer['phone_no'];
+        //         $amount = floatval($customer['amount']);
+        //         $response = $AirtimeService->sendAirtime($phone, $amount, "");
+        //         if ($response['status'] && $response['data']) {
+        //             $data = $response['data'];
+        //             $transactionId = $data['sid'];
+
+        //             // update customer
+        //             $customer->update(["transaction_id" => $transactionId, "updated_at" => now(), "status" => 'success', "other_info" => $response]);
+        //         }
+        //     } catch (\Throwable $th) {
+        //         //throw $th;
+        //         $d = json_encode($customer, true);
+        //         Log::channel('daily')->info("Error processing customer : $d: " . $th->getMessage());
+        //         $customer->update(["status" => "fail", "other_info" => $response]);
+        //     }
+        // }
     }
 }
