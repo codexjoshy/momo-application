@@ -2,9 +2,9 @@
     <nav class="sidenav shadow-right sidenav-light">
         <div class="sidenav-menu">
             <div class="nav accordion" id="side-nav">
-                <div class="sidenav-menu-heading">Home</div>
+                <div class="sidenav-menu-heading">Admin</div>
                 @can('admin')
-                <x-aside-dropdown title="Disbursement" key="disbursement">
+                {{-- <x-aside-dropdown title="Disbursement" key="disbursement">
                     <x-slot name="icon">
                         <i class="fa fa-book"></i>
                     </x-slot>
@@ -19,7 +19,12 @@
                         </x-slot>
                     </x-aside-link>
 
-                </x-aside-dropdown>
+                </x-aside-dropdown> --}}
+                <x-aside-link :href="route('admin.home')" title="Dashboard">
+                    <x-slot name="icon">
+                        <i class="fa fa-home"></i>
+                    </x-slot>
+                </x-aside-link>
                 <x-aside-dropdown title="Airtime" key="airtime">
                     <x-slot name="icon">
                         <i class="fa fa-cloud"></i>

@@ -65,8 +65,8 @@
                     <tr>
                         <td>{{ ++$loop->index }}</td>
                         <td>{{ $customer->phone_no }}</td>
-                        <td> ₦{{ number_format($customer->amount, 2) }}</td>
-                        <td><span class="bg btn btn-sm {{ $bg }} ">{{ $customer->status }}</span> </td>
+                        <td> ₦{{ number_format($customer->amount?:'', 2) }}</td>
+                        <td><span class="bg  btn-sm {{ $bg }} ">{{ $customer->status }}</span> </td>
                         <td>{{ $customer->transaction_id }}</td>
                         <td>
                             <p><small>scheduled @ {{ optional($customer->created_at)->format('Y-m-d H::i::s') }}</small>
