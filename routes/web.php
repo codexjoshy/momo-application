@@ -50,12 +50,12 @@ Route::get('/bal', function () {
     curl_setopt_array($curl, array(
         CURLOPT_URL => 'http://64.226.97.232:17171/jmg/web.html?jParams=eyJzaWQiOiJCQUwiLCJjb25maWciOiJhcGkiLCJhayI6IjdkZDVkY2NmODAxMmM2NDEyYjA3OWNiMzI2NjBiOTgxIiwiYXBpZCI6IkpvbGx5VGV0cmEiLCJyYyI6IjEiLCJ0eXBlIjoiNyJ9',
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
         CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'GET',
+        // CURLOPT_ENCODING => '',
+        // CURLOPT_MAXREDIRS => 10,
+        // CURLOPT_TIMEOUT => 0,
+        // CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     ));
 
     $response = curl_exec($curl);
