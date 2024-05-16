@@ -59,7 +59,7 @@
                     if($customer->status == 'fail') $bg = "btn-danger";
                     $sent="";
                     if ($customer->transaction_id) {
-                    $sent = $customer->updated_at->format('Y-m-d H:i:s');
+                    $sent = optional($customer->updated_at)->format('Y-m-d H:i:s');
                     }
                     @endphp
                     <tr>
