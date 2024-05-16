@@ -7,9 +7,7 @@ use App\Models\AppFeature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreAppFeatureRequest;
-use App\Http\Requests\UpdateAppFeatureRequest;
 use App\Services\airtime\AirtimeProcessor;
-use App\Services\AppFeatureService;
 use App\Services\Contracts\SmsServiceInterface;
 
 class AppFeatureController extends Controller
@@ -126,37 +124,5 @@ class AppFeatureController extends Controller
             return back()->with('error', $th->getMessage());
         }
         return redirect()->route('admin.feature.schedule.index', ['type' => 'airtime'])->with('success', "Schedule has been uploaded, you can track your schedule");
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(AppFeature $appFeature)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(AppFeature $appFeature)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAppFeatureRequest $request, AppFeature $appFeature)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(AppFeature $appFeature)
-    {
-        //
     }
 }

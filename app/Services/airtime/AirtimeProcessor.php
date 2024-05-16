@@ -40,7 +40,7 @@ class AirtimeProcessor
   // Or
   // '{"ogn":"08055555555","amt":"25","mk":false,"sid":"wIrede-1-2022-01-04", "config":"api", "ak":"e82cb56d3368d069306f7c1d780e", "apid":"abc-bet","data":true, "did":"18" }' data is true for data crediting and false for airtime crediting
   $environment = strtolower(app()->environment());
-  $operatorCode = "012"; // glo
+  $operatorCode = $this->getOperatorCode($phone); // glo
   $data = ["ogn" => $phone, "opid" => $operatorCode, "amt" => $amount, "mk" => $environment != 'production', "data" => false];
   $tranxId = $this->generateUUid();
   $encodedData = $this->generateData($data, $tranxId);
@@ -50,7 +50,7 @@ class AirtimeProcessor
 
   return $this->getResponse();
  }
- public function checkBalance(): string|array
+ public function checkBalance2(): string|array
  {
   $time = time();
   $encodedData = $this->generateData([], "BAL-$time");
@@ -85,7 +85,7 @@ class AirtimeProcessor
    return ["balance" => $balance];
   }
  }
- public function checkBalance2(): string|array
+ public function checkBalance(): string|array
  {
   $encodedData = $this->generateData();
   $balanceUrl = "{$this->baseUrl}";
@@ -120,6 +120,20 @@ class AirtimeProcessor
   Uuid::create(['uuid' => $uuid]);
 
   return $uuid;
+ }
+
+ private function getOperatorCode($phoneNumber): string|null
+ {
+  $operatorCodes = config('airtime.operators');
+  $operator = $this->detectOperator(substr($phoneNumber, 0, 4));
+  $operatorCode = $operatorCodes[$operator] ?? null;
+  return $operatorCode;
+ }
+
+ private function detectOperator($firstFourDigit): string
+ {
+  $operatorCodeList = config('airtime.operatorList');
+  return $operatorCodeList[$firstFourDigit];
  }
 
 
