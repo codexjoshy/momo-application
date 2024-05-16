@@ -65,7 +65,7 @@
                     <tr>
                         <td>{{ ++$loop->index }}</td>
                         <td>{{ $customer->phone_no }}</td>
-                        <td> ₦{{ number_format($customer->amount?:'', 2) }}</td>
+                        <td> ₦{{ $customer->amount? number_format($customer->amount, 2): '-' }}</td>
                         <td><span class="bg  btn-sm {{ $bg }} ">{{ $customer->status }}</span> </td>
                         <td>{{ $customer->transaction_id }}</td>
                         <td>
