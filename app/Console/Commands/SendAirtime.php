@@ -32,7 +32,7 @@ class SendAirtime extends Command
 
         $customers = AppFeatureCustomer::whereNull('transaction_id')->limit(50)->get();
         $AirtimeService = new AirtimeProcessor;
-        if ($customers) {
+        if ($customers && count($customers) > 0) {
             Log::channel('daily')->info("Sending airtime:...");
             foreach ($customers as $customer) {
                 try {
