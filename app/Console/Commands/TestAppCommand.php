@@ -26,6 +26,8 @@ class TestAppCommand extends Command
      */
     public function handle()
     {
+        $operatorCodeList = config('airtime.operatorCodeList');
+        dd($operatorCodeList);
         $phone = "2348135978939";
         $last4Digit = "0" . substr($phone, 3, 3);
         $operator = (new AirtimeProcessor)->detectOperator($last4Digit);
