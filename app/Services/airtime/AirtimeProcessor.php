@@ -39,6 +39,8 @@ class AirtimeProcessor
   //   {"ogn":"08055555555","opid":"012","amt":"10000","mk":false,"sid":"Ivvvv-1-2022-01-04", "config":"api", "ak":"e82cb56d3368d069306f7c1d780ee", "apid":"abc-bet" }'
   // Or
   // '{"ogn":"08055555555","amt":"25","mk":false,"sid":"wIrede-1-2022-01-04", "config":"api", "ak":"e82cb56d3368d069306f7c1d780e", "apid":"abc-bet","data":true, "did":"18" }' data is true for data crediting and false for airtime crediting
+
+  // {"ogn":"08055555555","opid":"012","amt":"10000","mk":false,"sid":"Ivvvv-1-2022-01-04", "config":"api", "ak":"e82cb56d3368d069306f7c1d780ee", "apid":"abc-bet" }'
   $phone = trim($phone);
   $amount = trim($amount);
   $environment = strtolower(app()->environment());
@@ -105,11 +107,13 @@ class AirtimeProcessor
  /**
   * used generate encoded data to be sent to api endpoint
   */
- private function generateData(array $extraData = [], string $transaxId = "BAL")
+ private function generateData(array $extraData = [], string $transaxId = "BAL", $isAirtime = false)
  {
   // '{"sid":"iIvvvv-1-2022-01-04", "config":"api", "ak":"e82cb56d3368d069306f7c1d780ee9cc", "apid":"better","rc":"1", "type":"7"}'
-  $data = ["sid" => $transaxId, "config" => "api", "ak" => $this->apikey, "apid" => $this->username, "rc" => "1", "type" => "7"];
+  $data = $isAirtime ?  ["sid" => $transaxId, "config" => "api", "ak" => $this->apikey, "apid" => $this->username] : ["sid" => $transaxId, "config" => "api", "ak" => $this->apikey, "apid" => $this->username, "rc" => "1", "type" => "7"];
   $data = count(array_keys($extraData)) ? array_merge($data, $extraData) : $data;
+
+  $this->logger("generated data AIRTIME: $isAirtime ", json_encode($data));
   $data = base64_encode(json_encode($data));
   return $data;
  }
