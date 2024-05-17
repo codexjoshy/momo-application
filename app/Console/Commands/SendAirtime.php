@@ -28,30 +28,33 @@ class SendAirtime extends Command
      */
     public function handle()
     {
-        Log::channel('daily')->info("Sending airtime:...");
+
 
         $customers = AppFeatureCustomer::whereNull('transaction_id')->limit(50)->get();
         $AirtimeService = new AirtimeProcessor;
-        foreach ($customers as $customer) {
-            try {
-                $phone = $customer['phone_no'];
-                $amount = floatval($customer['amount']);
-                $response = $AirtimeService->sendAirtime($phone, $amount, "");
-                if ($response['status'] && $response['data']) {
-                    $data = $response['data'];
-                    $transactionId = $data['sid'];
+        if ($customers) {
+            Log::channel('daily')->info("Sending airtime:...");
+            foreach ($customers as $customer) {
+                try {
+                    $phone = $customer['phone_no'];
+                    $amount = floatval($customer['amount']);
+                    $response = $AirtimeService->sendAirtime($phone, $amount, "");
+                    if ($response['status'] && $response['data']) {
+                        $data = $response['data'];
+                        $transactionId = $data['sid'];
 
-                    // update customer
-                    $customer->update(["transaction_id" => $transactionId, "updated_at" => now(), "status" => 'success', "other_info" => $response]);
+                        // update customer
+                        $customer->update(["transaction_id" => $transactionId, "updated_at" => now(), "status" => 'success', "other_info" => $response]);
+                    }
+                } catch (\Throwable $th) {
+                    //throw $th;
+                    $d = json_encode($customer, true);
+                    Log::channel('daily')->info("Error processing customer : $d: " . $th->getMessage());
+                    $customer->update(["status" => "fail", "other_info" => $th->getMessage()]);
                 }
-            } catch (\Throwable $th) {
-                //throw $th;
-                $d = json_encode($customer, true);
-                Log::channel('daily')->info("Error processing customer : $d: " . $th->getMessage());
-                $customer->update(["status" => "fail", "other_info" => $th->getMessage()]);
             }
-        }
 
-        Log::channel('daily')->info("Airtime sent to customers");
+            Log::channel('daily')->info("Airtime sent to customers");
+        }
     }
 }

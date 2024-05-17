@@ -32,10 +32,13 @@ class SendSms extends Command
         $smsService = new TermiiSmsService;
         $schedule = AppFeature::with('customers')->whereNull('sms_id')->whereHas('customers', fn ($q) => $q->where('status', 'success'))->first();
         if ($schedule) {
-            $customers = $schedule->customers;
+            $customers = $schedule->customers->where('status', 'success');
+            $total = $customers->sum('amount');
             $phones = $customers->pluck('phone_no')->toArray();
-            $sms = $FeatureService->sendSms($phones, $schedule->message, $smsService);
-            $schedule->update(["sms_id" => $sms['messageId'] ?? '', "other_info" => $sms['data']]);
+            if ($customers && (float)$total == (float)$schedule->total) {
+                $sms = $FeatureService->sendSms($phones, $schedule->message, $smsService);
+                $schedule->update(["sms_id" => $sms['messageId'] ?? '', "other_info" => $sms['data']]);
+            }
         }
     }
 }

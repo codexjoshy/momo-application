@@ -47,7 +47,7 @@ class AirtimeProcessor
   $amount = trim($amount);
   $environment = strtolower(app()->environment());
   $operatorCode = $this->getOperatorCode($phone);
-  $phone = "0" . ltrim($phone, "+234");
+  $phone = "0" . ltrim($phone, "234");
   $data = ["ogn" => $phone, "opid" => $operatorCode, "amt" => $amount, "mk" => $environment != 'production', "data" => false];
   $this->logger("generated data request payload", $data);
   $tranxId = $this->generateUUid();
@@ -135,7 +135,7 @@ class AirtimeProcessor
  public  function getOperatorCode($phoneNumber): string|null
  {
   $operatorCodes = config('airtime.operators');
-  $phoneNumber = ltrim($phoneNumber, "+");
+  // $phoneNumber = ltrim($phoneNumber, "+");
   $last4Digit = "0" . substr($phoneNumber, 3, 3);
   $operator = $this->detectOperator($last4Digit);
   $operatorCode = $operatorCodes[$operator] ?? null;

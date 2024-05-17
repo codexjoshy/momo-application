@@ -103,7 +103,7 @@ class AppFeatureController extends Controller
             foreach ($customers as $customer) {
                 $data[] = [
                     "app_feature_id" => $schedule->id,
-                    "phone_no" => $customer['phoneNumber'],
+                    "phone_no" => ltrim($customer['phoneNumber'], "+"),
                     "amount" => $customer['amount'],
                     "status" => "pending",
                     "created_at" => now(),
