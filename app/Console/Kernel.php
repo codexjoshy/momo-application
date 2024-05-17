@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
         date_default_timezone_set('Africa/Lagos');
         // Log::channel('daily')->info("Scheduling...");
         $schedule->command('send:airtime')->everyMinute()->withoutOverlapping();
-        $schedule->command('send:sms')->everyMinute()->withoutOverlapping();
+        // $schedule->command('send:sms')->everyMinute()->withoutOverlapping();
         // $schedule->command('inspire')->hourly();
     }
 
