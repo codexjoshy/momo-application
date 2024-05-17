@@ -41,10 +41,13 @@ class AirtimeProcessor
   // '{"ogn":"08055555555","amt":"25","mk":false,"sid":"wIrede-1-2022-01-04", "config":"api", "ak":"e82cb56d3368d069306f7c1d780e", "apid":"abc-bet","data":true, "did":"18" }' data is true for data crediting and false for airtime crediting
 
   // {"ogn":"08055555555","opid":"012","amt":"10000","mk":false,"sid":"Ivvvv-1-2022-01-04", "config":"api", "ak":"e82cb56d3368d069306f7c1d780ee", "apid":"abc-bet" }'
+
+  //{"sid":"TX84af8041-7599-4f6b-befb-35507d205753","config":"api","ak":"7dd5dccf8012c6412b079cb32660b981","apid":"JollyTetra","ogn":"+2348135978939","opid":"011","amt":"5","mk":false,"data":false}  
   $phone = trim($phone);
   $amount = trim($amount);
   $environment = strtolower(app()->environment());
-  $operatorCode = $this->getOperatorCode($phone); // glo
+  $operatorCode = $this->getOperatorCode($phone);
+  $phone = "0" . ltrim($phone, "+234");
   $data = ["ogn" => $phone, "opid" => $operatorCode, "amt" => $amount, "mk" => $environment != 'production', "data" => false];
   $this->logger("generated data request payload", $data);
   $tranxId = $this->generateUUid();
