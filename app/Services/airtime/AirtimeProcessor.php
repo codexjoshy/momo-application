@@ -137,6 +137,8 @@ class AirtimeProcessor
  public function detectOperator($firstFourDigit): string
  {
   $operatorCodeList = config('airtime.operatorCodeList');
+  Log::channel('daily')->info($operatorCodeList);
+  Log::channel('daily')->info($firstFourDigit);
   return $operatorCodeList[$firstFourDigit];
  }
 
