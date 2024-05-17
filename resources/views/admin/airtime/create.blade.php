@@ -8,7 +8,9 @@
                 <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                         SMS Balance</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">&#8358; {{ number_format($smsBalance['balance']) }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">&#8358; {{ $smsBalance?
+                        number_format($smsBalance['balance']):0
+                        }}</div>
                 </div>
                 <div class="col-auto">
                     <i class="fa fa-money fa-2x text-gray-300"></i>
@@ -28,13 +30,14 @@
                     <x-base.input name="title" :value="old('name')" placeholder="Enter title" />
                 </x-base.form-group>
                 <x-base.form-group label="Amount Disbursed" class="col-12" :required="true">
-                    <x-base.input id="amount" name="amount" :value="old('amount')" type="number" placeholder="Enter total amount" />
+                    <x-base.input id="amount" name="amount" :value="old('amount')" type="number"
+                        placeholder="Enter total amount" />
                 </x-base.form-group>
                 <x-base.form-group label="Customer Message" class="col-12" :required="true">
                     <x-base.input name="message" :value="old('message')" placeholder="Enter message" />
                 </x-base.form-group>
                 <x-base.form-group label="List of Customers" class="col-12" :required="true">
-                    <x-base.input id="upload" name="upload" type="file" :value="old('upload')"  />
+                    <x-base.input id="upload" name="upload" type="file" :value="old('upload')" />
                 </x-base.form-group>
 
                 <x-base.form-group class="d-flex justify-content-center col-12">
@@ -50,7 +53,12 @@
             </x-slot>
             <x-base.table tbodyClass="tbody">
                 <x-slot name='thead'>
-                    <tr><th>S/N</th><th>Customer Phone Number</th> <th>Airtime Amount</th><th></th></tr>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Customer Phone Number</th>
+                        <th>Airtime Amount</th>
+                        <th></th>
+                    </tr>
                 </x-slot>
                 <x-slot name="tbody">
 
@@ -62,8 +70,8 @@
 </div>
 @endsection
 @push('scripts')
-    <script>
-        $(function() {
+<script>
+    $(function() {
             $('#upload').change(function(e) {
                 processCSV(e.target.files);
             })
@@ -93,7 +101,7 @@
                         $('#loading').html(`<h6 class='text-warning'>Preview Loading... kindly hold on</h6>`);
                     },
                     success: function (data){
-
+                        console.log({data});
                         const errors = data?.error;
                         const result = data?.data;
                         const records = data?.records;
@@ -151,13 +159,14 @@
                                 let amount = parseFloat(record?.amount || 0)
                                 recordAmount += amount;
                                 let formatAmt = new Intl.NumberFormat('en-IN', { maximumSignificantDigits: 3 }).format(amount);
+                                let operator = record?.operator;
 
                                 tr += `
                                     <tr>
                                         <td>${k}</td>
                                         <td>${record?.phone}</td>
                                         <td>${formatAmt}</td>
-                                        <td></td>
+                                        <td>${operator}</td>
                                     </tr>
                                 `;
                             }
@@ -179,5 +188,5 @@
             }
         }
         })
-    </script>
+</script>
 @endpush

@@ -9,7 +9,8 @@
                 <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                         SMS Balance</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">&#8358; {{ number_format($smsBalance['balance'])
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">&#8358; {{ $smsBalance?
+                        number_format($smsBalance['balance']):0
                         }}</div>
                 </div>
                 <div class="col-auto">
@@ -26,7 +27,8 @@
                 <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                         Airtime Balance</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">&#8358; {{ number_format($airTimeBalance) }}
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">&#8358; {{ isset($airTimeBalance)?
+                        number_format($airTimeBalance):0 }}
                     </div>
                 </div>
                 <div class="col-auto">

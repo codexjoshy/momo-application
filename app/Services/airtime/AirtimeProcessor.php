@@ -39,6 +39,8 @@ class AirtimeProcessor
   //   {"ogn":"08055555555","opid":"012","amt":"10000","mk":false,"sid":"Ivvvv-1-2022-01-04", "config":"api", "ak":"e82cb56d3368d069306f7c1d780ee", "apid":"abc-bet" }'
   // Or
   // '{"ogn":"08055555555","amt":"25","mk":false,"sid":"wIrede-1-2022-01-04", "config":"api", "ak":"e82cb56d3368d069306f7c1d780e", "apid":"abc-bet","data":true, "did":"18" }' data is true for data crediting and false for airtime crediting
+  $phone = trim($phone);
+  $amount = trim($amount);
   $environment = strtolower(app()->environment());
   $operatorCode = $this->getOperatorCode($phone); // glo
   $data = ["ogn" => $phone, "opid" => $operatorCode, "amt" => $amount, "mk" => $environment != 'production', "data" => false];
@@ -122,17 +124,19 @@ class AirtimeProcessor
   return $uuid;
  }
 
- private function getOperatorCode($phoneNumber): string|null
+ public  function getOperatorCode($phoneNumber): string|null
  {
   $operatorCodes = config('airtime.operators');
-  $operator = $this->detectOperator(substr($phoneNumber, 0, 4));
+  $phoneNumber = ltrim($phoneNumber, "+");
+  $last4Digit = "0" . substr($phoneNumber, 3, 3);
+  $operator = $this->detectOperator($last4Digit);
   $operatorCode = $operatorCodes[$operator] ?? null;
   return $operatorCode;
  }
 
- private function detectOperator($firstFourDigit): string
+ public function detectOperator($firstFourDigit): string
  {
-  $operatorCodeList = config('airtime.operatorList');
+  $operatorCodeList = config('airtime.operatorCodeList');
   return $operatorCodeList[$firstFourDigit];
  }
 

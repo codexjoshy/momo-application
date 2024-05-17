@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\airtime\AirtimeProcessor;
 use Illuminate\Http\Request;
 use Illuminate\Routing\ResponseFactory as Response;
 
@@ -27,15 +28,18 @@ class AjaxController extends Controller
                     //     $errors[$k] = "record is more than 2, please check";
                     // }
                     if ($phone && $amount && $amount > 0) {
-                        if(!filter_var($phone, FILTER_VALIDATE_INT)) $errors[$k] = "invalid phone provided,";
-                        if(strlen($phone) < 10 || strlen($phone) > 13) $errors[$k] = "phone length ".strlen($phone)." does not meet standards,";
+                        if (!filter_var($phone, FILTER_VALIDATE_INT)) $errors[$k] = "invalid phone provided,";
+                        if (strlen($phone) < 10 || strlen($phone) > 13) $errors[$k] = "phone length " . strlen($phone) . " does not meet standards,";
                         if (in_array($phone, $phones)) $errors[$k] = "duplicate phone number,";
+                        $last4Digit = "0" . substr($phone, 3, 3);
+                        $operator = (new AirtimeProcessor)->detectOperator($last4Digit);
+                        if (!$operator)  $errors[$k] = "invalid operator detected, ";
+
                         $phones[] = $phone;
 
-                        if(!count($errors)){
-                            $data[] = ["phone"=> $phone, "amount"=> $amount];
+                        if (!count($errors)) {
+                            $data[] = ["phone" => $phone, "amount" => $amount, "operator" => $operator];
                         }
-
                     } else {
                         $errors[$k] =  "invalid data provided";
                     }

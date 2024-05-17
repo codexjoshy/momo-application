@@ -48,7 +48,7 @@ class SendAirtime extends Command
                 //throw $th;
                 $d = json_encode($customer, true);
                 Log::channel('daily')->info("Error processing customer : $d: " . $th->getMessage());
-                $customer->update(["status" => "fail", "other_info" => $response]);
+                $customer->update(["status" => "fail", "other_info" => $th->getMessage()]);
             }
         }
 
