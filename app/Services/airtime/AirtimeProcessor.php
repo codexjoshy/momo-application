@@ -48,7 +48,7 @@ class AirtimeProcessor
   $data = ["ogn" => $phone, "opid" => $operatorCode, "amt" => $amount, "mk" => $environment != 'production', "data" => false];
   $this->logger("generated data request payload", $data);
   $tranxId = $this->generateUUid();
-  $encodedData = $this->generateData($data, $tranxId);
+  $encodedData = $this->generateData($data, $tranxId, true);
 
   $this->httpResponse = Http::get($this->baseUrl, ["jParams" => $encodedData]);
   $this->logger("Response of airtime sending to $phone", json_encode($this->getResponse()));
