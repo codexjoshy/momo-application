@@ -44,6 +44,7 @@ class AirtimeProcessor
   $environment = strtolower(app()->environment());
   $operatorCode = $this->getOperatorCode($phone); // glo
   $data = ["ogn" => $phone, "opid" => $operatorCode, "amt" => $amount, "mk" => $environment != 'production', "data" => false];
+  $this->logger("generated data request payload", $data);
   $tranxId = $this->generateUUid();
   $encodedData = $this->generateData($data, $tranxId);
 
